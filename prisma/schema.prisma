@@ -1,0 +1,119 @@
+// Prisma Schema for Academic Replication: Witte et al. (2025)
+// "Dark patterns in online retailing: an analysis based on information manipulation theory"
+// Compatible with PostgreSQL & CockroachDB
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum GroupType {
+  CONTROL
+  SCARCITY
+  SNEAKING
+  BOTH
+}
+
+model Participant {
+  participantUuid String    @id @map("participant_uuid")
+  groupType       GroupType @map("group_type")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  response Response?
+
+  @@map("participants")
+}
+
+model Response {
+  responseId      Int         @id @default(autoincrement()) @map("response_id")
+  participantUuid String      @unique @map("participant_uuid")
+  participant     Participant @relation(fields: [participantUuid], references: [participantUuid])
+  groupType       GroupType   @map("group_type")
+
+  // Information Quality (QUAL)
+  qual1 Int @map("qual1") // Information is accurate
+  qual2 Int @map("qual2") // Information is reliable
+  qual3 Int @map("qual3") // Information reflects reality
+  qual4 Int @map("qual4") // Information is truthful
+
+  // Information Quantity (QUAN)
+  quan1 Int @map("quan1") // Website provides sufficient info
+  quan2 Int @map("quan2") // Quantity of info is appropriate
+  quan3 Int @map("quan3") // Website does not conceal key info
+  quan4 Int @map("quan4") // Necessary information is disclosed
+
+  // Information Relevance (REL)
+  rel1 Int @map("rel1") // Relevant to purchase decision
+  rel2 Int @map("rel2") // Fits evaluation needs
+  rel3 Int @map("rel3") // Useful for decision making
+
+  // Information Clarity (CLA)
+  cla1 Int @map("cla1") // Clearly presented
+  cla2 Int @map("cla2") // Easy to understand
+  cla3 Int @map("cla3") // Not confusing
+  cla4 Int @map("cla4") // Transparently presented
+
+  // Perceived Customer Manipulation (PCM)
+  pcm1 Int @map("pcm1") // Trying to impact my purchase decision
+  pcm2 Int @map("pcm2") // Trying to steer me towards site's preferred choice
+  pcm3 Int @map("pcm3") // Trying to manipulate shopping behavior
+  pcm4 Int @map("pcm4") // Influencing in non-transparent way
+  pcm5 Int @map("pcm5") // Prioritizes site interest over customer
+  pcm6 Int @map("pcm6") // Feeling steered into making a purchase
+
+  // Attitude toward Website (ATT)
+  att1 Int @map("att1") // Positive impression
+  att2 Int @map("att2") // Like this website
+  att3 Int @map("att3") // Good website
+  att4 Int @map("att4") // Positive feeling
+
+  // Purchase Intention (PI)
+  pi1 Int @map("pi1") // Intend to buy
+  pi2 Int @map("pi2") // Consider buying
+  pi3 Int @map("pi3") // High probability of buying
+
+  // Loyalty Intention (LOY)
+  loy1 Int @map("loy1") // Return in the future
+  loy2 Int @map("loy2") // Prioritize when buying similar
+  loy3 Int @map("loy3") // Recommend to others
+
+  // Online Shopping Familiarity (FAM)
+  fam1 Int @map("fam1") // Frequently shop online
+  fam2 Int @map("fam2") // Experienced online shopper
+  fam3 Int @map("fam3") // Familiar with e-commerce sites
+  fam4 Int @map("fam4") // Understand e-commerce mechanisms
+
+  // Manipulation Checks
+  sc1 String? @map("sc1") // "Chỉ còn 3 sản phẩm" seen? (Yes/No)
+  sc2 String? @map("sc2") // "53 người đang xem" seen? (Yes/No)
+  sn1 String? @map("sn1") // "Premium Shipping" auto added seen? (Yes/No)
+
+  // Durations (in seconds)
+  productPageDuration Int @map("product_page_duration")
+  cartPageDuration    Int @map("cart_page_duration")
+  surveyDuration      Int @map("survey_duration")
+  totalDuration       Int @map("total_duration")
+
+  // Quality Control Flags
+  isSpeeding         Boolean @default(false) @map("is_speeding") // < 60s
+  failedManipulation Boolean @default(false) @map("failed_manipulation")
+
+  startedAt   DateTime @map("started_at")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  @@map("responses")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  uid       String   @unique
+  email     String
+  role      String   @default("researcher")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}

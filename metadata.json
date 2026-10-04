@@ -1,0 +1,6 @@
+{
+  "name": "IMT Dark Patterns Academic Research Lab",
+  "description": "Full-stack academic experimentation platform replicating Witte et al. (2025) on dark patterns in online retailing with Information Manipulation Theory (IMT) and SEM-ready data exports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
